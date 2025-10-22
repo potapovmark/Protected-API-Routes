@@ -5,6 +5,9 @@ import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import path from 'path';
 import authRoutes from './routes/auth';
+import protectedTodosRoutes from './routes/protectedTodos';
+import adminRoutes from './routes/admin';
+import profileRoutes from './routes/profile';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +26,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.use('/api/auth', authRoutes);
+app.use('/api/protected/todos', protectedTodosRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
@@ -46,4 +52,12 @@ app.get('/verify', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+app.get('/todos', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/index.html'));
 });

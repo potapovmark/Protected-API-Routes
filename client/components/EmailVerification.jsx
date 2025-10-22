@@ -54,7 +54,6 @@ const EmailVerification = () => {
         setMessage('Verification token generated!');
         setStatus('token_ready');
 
-        // Сохраняем токен для автоматической верификации
         if (result.data && result.data.verificationToken) {
           setVerificationToken(result.data.verificationToken);
         }
@@ -91,7 +90,7 @@ const EmailVerification = () => {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', textAlign: 'center' }}>
-      <h2>Подтверждение Email</h2>
+      <h2>Email Verification</h2>
 
 
       {status === 'waiting' && (
@@ -101,8 +100,8 @@ const EmailVerification = () => {
           borderRadius: '4px',
           marginBottom: '20px'
         }}>
-          <h3>Получить токен верификации</h3>
-          <p>Введите ваш email, чтобы получить токен верификации:</p>
+          <h3>Get verification token</h3>
+          <p>Enter your email to get verification token:</p>
           <button
             onClick={resendVerification}
             style={{
@@ -115,7 +114,7 @@ const EmailVerification = () => {
               fontSize: '16px'
             }}
           >
-            Получить токен
+            Get Token
           </button>
         </div>
       )}
@@ -127,7 +126,7 @@ const EmailVerification = () => {
           borderRadius: '4px',
           marginBottom: '20px'
         }}>
-          <p>Отправка запроса...</p>
+          <p>Sending request...</p>
         </div>
       )}
 
@@ -138,8 +137,8 @@ const EmailVerification = () => {
           borderRadius: '4px',
           marginBottom: '20px'
         }}>
-          <h3>Токен готов!</h3>
-          <p>Нажмите кнопку ниже, чтобы автоматически подтвердить email:</p>
+          <h3>Token ready!</h3>
+          <p>Click the button below to automatically verify email:</p>
           <button
             onClick={autoVerify}
             style={{
@@ -153,7 +152,7 @@ const EmailVerification = () => {
               marginTop: '10px'
             }}
           >
-            ✅ Подтвердить Email
+            ✅ Verify Email
           </button>
         </div>
       )}
@@ -165,8 +164,8 @@ const EmailVerification = () => {
           borderRadius: '4px',
           marginBottom: '20px'
         }}>
-          <h3>Подтверждение...</h3>
-          <p>Подтверждаем ваш email...</p>
+          <h3>Verifying...</h3>
+          <p>Verifying your email...</p>
           <div style={{ marginTop: '20px' }}>
             <div style={{
               width: '40px',
@@ -189,7 +188,7 @@ const EmailVerification = () => {
           borderRadius: '4px',
           marginBottom: '20px'
         }}>
-          <h3>✅ Успешно!</h3>
+          <h3>✅ Success!</h3>
           <p>{message}</p>
           <button
             onClick={() => window.location.href = '/'}
@@ -204,7 +203,7 @@ const EmailVerification = () => {
               fontSize: '16px'
             }}
           >
-            🏠 Назад к входу
+             Back to login
           </button>
         </div>
       )}
@@ -217,7 +216,7 @@ const EmailVerification = () => {
           borderRadius: '4px',
           marginTop: '20px'
         }}>
-          <h3>❌ Ошибка</h3>
+          <h3> Error </h3>
           <p>{message}</p>
           <button
             onClick={resendVerification}
@@ -231,7 +230,7 @@ const EmailVerification = () => {
               marginTop: '10px'
             }}
           >
-            🔄 Попробовать снова
+            Try again
           </button>
         </div>
       )}
@@ -247,4 +246,3 @@ const EmailVerification = () => {
 };
 
 export default EmailVerification;
-

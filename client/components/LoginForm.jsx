@@ -7,6 +7,7 @@ const LoginForm = ({ onSuccess }) => {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [loginResult, setLoginResult] = useState(null);
   const { login, error, clearError } = useAuth();
 
   const handleChange = (e) => {
@@ -16,17 +17,21 @@ const LoginForm = ({ onSuccess }) => {
       [name]: value
     }));
     if (error) clearError();
+    if (loginResult) setLoginResult(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginResult(null);
 
     try {
       const result = await login(formData.email, formData.password);
 
       if (result.success) {
         onSuccess && onSuccess();
+      } else {
+        setLoginResult(result);
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -43,18 +48,18 @@ const LoginForm = ({ onSuccess }) => {
         borderRadius: '8px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ textAlign: 'center', color: '#495057', marginBottom: '30px' }}>Вход в систему</h2>
+        <h2 style={{ textAlign: 'center', color: '#495057', marginBottom: '30px' }}>Login</h2>
 
-        {error && (
+        {(error || loginResult) && (
           <div style={{
             padding: '12px',
-            backgroundColor: '#f8d7da',
+            backgroundColor: loginResult?.accountLocked ? '#f8d7da' : '#f8d7da',
             color: '#721c24',
             borderRadius: '4px',
             marginBottom: '20px',
             textAlign: 'center'
           }}>
-            {error}
+            {error || loginResult?.error}
           </div>
         )}
 
@@ -80,7 +85,7 @@ const LoginForm = ({ onSuccess }) => {
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }} htmlFor="password">Пароль:</label>
+            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }} htmlFor="password">Password:</label>
             <input
               type="password"
               id="password"
@@ -114,7 +119,7 @@ const LoginForm = ({ onSuccess }) => {
               fontWeight: 'bold'
             }}
           >
-            {isLoading ? 'Вход...' : 'Войти'}
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>

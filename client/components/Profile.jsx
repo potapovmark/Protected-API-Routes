@@ -7,7 +7,7 @@ const Profile = () => {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [verificationStatus, setVerificationStatus] = useState('idle'); // idle, requesting, verifying, success, error
+  const [verificationStatus, setVerificationStatus] = useState('idle');
   const [verificationMessage, setVerificationMessage] = useState('');
 
   useEffect(() => {
@@ -19,12 +19,12 @@ const Profile = () => {
         const response = await authClient.getProfile();
 
         if (response.success) {
-          setProfileData(response.data.user);
+          setProfileData(response.data);
         } else {
-          setError(response.error || 'Неизвестная ошибка');
+          setError(response.error || 'Unknown error');
         }
       } catch (err) {
-        setError('Ошибка загрузки профиля: ' + err.message);
+        setError('Profile loading error: ' + err.message);
       } finally {
         setLoading(false);
       }
@@ -39,7 +39,7 @@ const Profile = () => {
 
     try {
       setVerificationStatus('requesting');
-      setVerificationMessage('Запрос токена верификации...');
+      setVerificationMessage('Requesting verification token...');
 
       const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
@@ -52,9 +52,8 @@ const Profile = () => {
       const result = await response.json();
 
       if (result.success) {
-        setVerificationMessage('Токен получен! Нажмите кнопку подтверждения.');
+        setVerificationMessage('Token received! Click the verification button.');
         setVerificationStatus('ready');
-        // Сохраняем токен для автоматической верификации
         if (result.data?.verificationToken) {
           window.verificationToken = result.data.verificationToken;
         }
@@ -63,39 +62,38 @@ const Profile = () => {
         setVerificationStatus('error');
       }
     } catch (error) {
-      setVerificationMessage('Ошибка при запросе токена верификации');
+      setVerificationMessage('Error requesting verification token');
       setVerificationStatus('error');
     }
   };
 
   const verifyEmail = async () => {
     if (!window.verificationToken) {
-      setVerificationMessage('Сначала получите токен верификации');
+      setVerificationMessage('First get verification token');
       setVerificationStatus('error');
       return;
     }
 
     try {
       setVerificationStatus('verifying');
-      setVerificationMessage('Подтверждение email...');
+      setVerificationMessage('Verifying email...');
 
       const response = await fetch(`/api/auth/verify-email?token=${window.verificationToken}`);
       const result = await response.json();
 
       if (result.success) {
-        setVerificationMessage('Email успешно подтвержден!');
+        setVerificationMessage('Email successfully verified!');
         setVerificationStatus('success');
-        // Обновляем данные профиля
+
         const updatedProfile = { ...(profileData || user), isEmailVerified: true };
         setProfileData(updatedProfile);
-        // Очищаем токен
         window.verificationToken = null;
       } else {
         setVerificationMessage(result.error);
         setVerificationStatus('error');
       }
     } catch (error) {
-      setVerificationMessage('Ошибка при подтверждении email');
+      setVerificationMessage('Error verifying email');
       setVerificationStatus('error');
     }
   };
@@ -109,7 +107,7 @@ const Profile = () => {
         height: '400px',
         fontSize: '18px'
       }}>
-        Загрузка профиля...
+        Loading profile...
       </div>
     );
   }
@@ -125,7 +123,7 @@ const Profile = () => {
         borderRadius: '8px',
         textAlign: 'center'
       }}>
-        <h3>Ошибка</h3>
+        <h3>Error</h3>
         <p>{error}</p>
         <button
           onClick={logout}
@@ -138,7 +136,7 @@ const Profile = () => {
             cursor: 'pointer'
           }}
         >
-          Выйти
+          Logout
         </button>
       </div>
     );
@@ -157,14 +155,14 @@ const Profile = () => {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <h2 style={{ color: '#495057', marginBottom: '10px' }}>
-            Добро пожаловать, {profile.profile?.firstName || profile.username}!
+            Welcome, {profile.profile?.firstName || profile.username}!
           </h2>
-          <p style={{ color: '#6c757d', margin: 0 }}>Ваша панель управления</p>
+          <p style={{ color: '#6c757d', margin: 0 }}>Your dashboard</p>
         </div>
 
         <div style={{ marginBottom: '25px' }}>
           <h3 style={{ color: '#495057', marginBottom: '15px', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>
-            Информация о профиле
+            Profile Information
           </h3>
 
           <div style={{ display: 'grid', gap: '15px' }}>
@@ -174,26 +172,26 @@ const Profile = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <span style={{ fontWeight: 'bold', color: '#495057' }}>Имя пользователя:</span>
+              <span style={{ fontWeight: 'bold', color: '#495057' }}>Username:</span>
               <span style={{ color: '#6c757d' }}>{profile.username}</span>
             </div>
 
             {profile.profile?.firstName && (
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                <span style={{ fontWeight: 'bold', color: '#495057' }}>Имя:</span>
+                <span style={{ fontWeight: 'bold', color: '#495057' }}>First Name:</span>
                 <span style={{ color: '#6c757d' }}>{profile.profile.firstName}</span>
               </div>
             )}
 
             {profile.profile?.lastName && (
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                <span style={{ fontWeight: 'bold', color: '#495057' }}>Фамилия:</span>
+                <span style={{ fontWeight: 'bold', color: '#495057' }}>Last Name:</span>
                 <span style={{ color: '#6c757d' }}>{profile.profile.lastName}</span>
               </div>
             )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <span style={{ fontWeight: 'bold', color: '#495057' }}>Роль:</span>
+              <span style={{ fontWeight: 'bold', color: '#495057' }}>Role:</span>
               <span style={{
                 padding: '4px 8px',
                 borderRadius: '12px',
@@ -207,7 +205,7 @@ const Profile = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-              <span style={{ fontWeight: 'bold', color: '#495057' }}>Статус верификации:</span>
+              <span style={{ fontWeight: 'bold', color: '#495057' }}>Verification Status:</span>
               <span style={{
                 padding: '4px 8px',
                 borderRadius: '12px',
@@ -216,7 +214,7 @@ const Profile = () => {
                 backgroundColor: profile.isEmailVerified ? '#28a745' : '#ffc107',
                 color: profile.isEmailVerified ? 'white' : '#212529'
               }}>
-                {profile.isEmailVerified ? 'Подтвержден' : 'Не подтвержден'}
+                {profile.isEmailVerified ? 'Verified' : 'Not verified'}
               </span>
             </div>
           </div>
@@ -225,7 +223,7 @@ const Profile = () => {
         {!profile.isEmailVerified && (
           <div style={{ marginBottom: '25px' }}>
             <h3 style={{ color: '#495057', marginBottom: '15px', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>
-              📧 Подтверждение Email
+              📧 Email Verification
             </h3>
 
             <div style={{
@@ -250,7 +248,7 @@ const Profile = () => {
                     fontWeight: 'bold'
                   }}
                 >
-                  🔑 Получить токен верификации
+                  🔑 Get verification token
                 </button>
               )}
 
@@ -286,7 +284,7 @@ const Profile = () => {
                       fontWeight: 'bold'
                     }}
                   >
-                    ✅ Подтвердить Email
+                    ✅ Verify Email
                   </button>
                 </div>
               )}
@@ -343,7 +341,7 @@ const Profile = () => {
                       fontSize: '12px'
                     }}
                   >
-                    🔄 Попробовать снова
+                    🔄 Try Again
                   </button>
                 </div>
               )}
@@ -354,7 +352,7 @@ const Profile = () => {
         {profile.profile?.bio && (
           <div style={{ marginBottom: '25px' }}>
             <h3 style={{ color: '#495057', marginBottom: '15px', borderBottom: '2px solid #e9ecef', paddingBottom: '10px' }}>
-              О себе
+              About Me
             </h3>
             <p style={{
               padding: '15px',
@@ -382,12 +380,12 @@ const Profile = () => {
               fontWeight: 'bold'
             }}
           >
-            Выйти из системы
+            Logout
           </button>
         </div>
       </div>
 
-      {/* CSS анимация для спиннера */}
+      {/* CSS animation for spinner */}
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }

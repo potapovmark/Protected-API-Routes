@@ -88,7 +88,7 @@ router.post('/resend-verification', verificationLimiter, async (req, res) => {
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 50,
   message: 'Too many login attempts, please try again later'
 });
 
@@ -105,7 +105,9 @@ router.post('/login', loginLimiter, async (req, res) => {
     } else {
       res.status(401).json({
         success: false,
-        error: result.error
+        error: result.error,
+        accountLocked: result.accountLocked,
+        remainingAttempts: result.remainingAttempts
       });
     }
   });
@@ -181,6 +183,45 @@ router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res)
       });
     } else {
       res.status(404).json({
+        success: false,
+        error: result.error
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+router.post('/unlock-account', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized'
+      });
+    }
+
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'User ID is required'
+      });
+    }
+
+    const result = await authService.unlockAccount(userId, req.user.userId);
+
+    if (result.success) {
+      res.json({
+        success: true,
+        message: 'Account unlocked successfully'
+      });
+    } else {
+      res.status(400).json({
         success: false,
         error: result.error
       });

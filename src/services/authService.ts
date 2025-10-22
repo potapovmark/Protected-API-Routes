@@ -13,6 +13,8 @@ export interface LoginResult {
     refreshToken: string;
   };
   error?: string;
+  accountLocked?: boolean;
+  remainingAttempts?: number;
 }
 
 export interface TokenResult {
@@ -36,8 +38,50 @@ export const authService = {
       if (error) return {success: false, error: 'Invalid email or password'};
 
       const user = await User.findOne({email: email.toLowerCase()});
-      if (!user || !await user.comparePassword(password)) {
-        return {success: false, error: 'Invalid email or password'};
+      if (!user) {
+        return {success: false, error: 'Invalid email'};
+      }
+
+      if (user.isLocked) {
+        const lockTime = user.lockUntil ? Math.round((user.lockUntil.getTime() - Date.now()) / 1000 / 60) : 0;
+        return {
+          success: false,
+          error: `Account locked. Try again in ${lockTime} minutes.`,
+          accountLocked: true
+        };
+      }
+
+      const isPasswordValid = await user.comparePassword(password);
+
+      if (!isPasswordValid) {
+        user.loginAttempts += 1;
+
+        if (user.loginAttempts >= 50) {
+          user.lockUntil = new Date(Date.now() + 30 * 60 * 1000);
+        }
+
+        await user.save();
+
+        const remainingAttempts = 5 - user.loginAttempts;
+        if (remainingAttempts > 0) {
+          return {
+            success: false,
+            error: `Invalid password. ${remainingAttempts} attempts remaining.`,
+            remainingAttempts: remainingAttempts
+          };
+        } else {
+          return {
+            success: false,
+            error: 'Account locked due to too many failed attempts. Try again in 30 minutes.',
+            accountLocked: true
+          };
+        }
+      }
+
+      if (user.loginAttempts > 0 || user.lockUntil) {
+        user.loginAttempts = 0;
+        user.lockUntil = undefined;
+        await user.save();
       }
 
       const accessToken = jwt.sign({userId: user._id}, JWT_SECRET, {expiresIn: '15min'});
@@ -72,9 +116,21 @@ export const authService = {
       return { success: false, error: 'Invalid refresh token' };
     }
   },
-  verifyAccessToken(token: string): { userId: string; email: string; role: string } | null {
+  async verifyAccessToken(token: string): Promise<{ userId: string; email: string; role: string, isEmailVerified: boolean } | null> {
     try {
-      return jwt.verify(token, JWT_SECRET) as { userId: string; email: string; role: string };
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+      const user = await User.findById(decoded.userId).select('email role isEmailVerified');
+      if (!user) {
+        return null;
+      }
+
+      return {
+        userId: decoded.userId,
+        email: user.email,
+        role: user.role,
+        isEmailVerified: user.isEmailVerified
+      }
     } catch (error) {
       return null;
     }
@@ -124,6 +180,28 @@ export const authService = {
     } catch (error) {
       console.error('Error getting user profile:', error);
       return { success: false, error: 'Failed to get user profile' };
+    }
+  },
+
+  async unlockAccount(userId: string, adminUserId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const admin = await User.findById(adminUserId);
+      if (!admin || admin.role !== 'admin') {
+        return { success: false, error: 'Unauthorized. Admin access required.' };
+      }
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return { success: false, error: 'User not found' };
+      }
+
+      user.loginAttempts = 0;
+      user.lockUntil = undefined;
+      await user.save();
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'Failed to unlock account' };
     }
   }
 }

@@ -47,7 +47,7 @@ const RegistrationForm = ({ onSuccess }) => {
       const result = await response.json();
 
       if (result.success) {
-        setMessage('Регистрация успешна! Проверьте вашу почту для подтверждения.');
+        setMessage('Registration successful! Check your email for verification.');
         setFormData({
           email: '',
           password: '',
@@ -62,19 +62,19 @@ const RegistrationForm = ({ onSuccess }) => {
       } else {
         let errorMessage = result.error;
 
-        // Улучшаем сообщения об ошибках
+        // Improve error messages
         if (errorMessage.includes('password') && errorMessage.includes('fails to match')) {
-          errorMessage = 'Пароль не соответствует требованиям безопасности. Используйте заглавные и строчные буквы, цифры и специальные символы.';
+          errorMessage = 'Password does not meet security requirements. Use uppercase and lowercase letters, numbers and special characters.';
         } else if (errorMessage.includes('already exists')) {
-          errorMessage = 'Пользователь с таким email или именем уже существует.';
+          errorMessage = 'User with this email or username already exists.';
         } else if (errorMessage.includes('email')) {
-          errorMessage = 'Некорректный формат email.';
+          errorMessage = 'Invalid email format.';
         }
 
-        setMessage(`Ошибка: ${errorMessage}`);
+        setMessage(`Error: ${errorMessage}`);
       }
     } catch (error) {
-      setMessage('Ошибка регистрации. Попробуйте еще раз.');
+      setMessage('Registration error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ const RegistrationForm = ({ onSuccess }) => {
 
   return (
     <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px' }}>
-      <h2 style={{ textAlign: 'center', color: '#495057', marginBottom: '30px' }}>Регистрация пользователя</h2>
+      <h2 style={{ textAlign: 'center', color: '#495057', marginBottom: '30px' }}>User Registration</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Email:</label>
@@ -97,7 +97,7 @@ const RegistrationForm = ({ onSuccess }) => {
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Пароль:</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Password:</label>
           <input
             type="password"
             name="password"
@@ -107,12 +107,12 @@ const RegistrationForm = ({ onSuccess }) => {
             style={{ width: '100%', padding: '12px', border: '1px solid #ced4da', borderRadius: '4px', fontSize: '16px' }}
           />
           <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '5px' }}>
-            Пароль должен содержать: минимум 8 символов, заглавные и строчные буквы, цифры и специальные символы (@$!%*?&)
+            Password must contain: minimum 8 characters, uppercase and lowercase letters, numbers and special characters (@$!%*?&)
           </div>
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Имя пользователя:</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Username:</label>
           <input
             type="text"
             name="username"
@@ -124,7 +124,7 @@ const RegistrationForm = ({ onSuccess }) => {
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Имя:</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>First Name:</label>
           <input
             type="text"
             name="firstName"
@@ -136,7 +136,7 @@ const RegistrationForm = ({ onSuccess }) => {
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Фамилия:</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>Last Name:</label>
           <input
             type="text"
             name="lastName"
@@ -148,7 +148,7 @@ const RegistrationForm = ({ onSuccess }) => {
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>О себе:</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: '#495057' }}>About:</label>
           <textarea
             name="bio"
             value={formData.bio}
@@ -173,7 +173,7 @@ const RegistrationForm = ({ onSuccess }) => {
             fontWeight: 'bold'
           }}
         >
-          {loading ? 'Регистрация...' : 'Зарегистрироваться'}
+          {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
 
@@ -193,5 +193,3 @@ const RegistrationForm = ({ onSuccess }) => {
 };
 
 export default RegistrationForm;
-
-

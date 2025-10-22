@@ -96,5 +96,3 @@ userSchema.virtual('isLocked').get(function() {
 });
 
 export const User = mongoose.model<IUser>('User', userSchema);
-
-

@@ -107,5 +107,3 @@ describe('RegistrationService', () => {
     expect(result.error).toContain('User not found');
   });
 });
-
-

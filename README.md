@@ -1,35 +1,29 @@
-Production-ready JWT authentication with React frontend.
+JWT Authentication System with React & Express
 
-## 🚀 Start
+## Quick Start
 
 ```bash
 npm install
 npm run dev          # Backend (port 3000)
-npm run client:dev   # Frontend (port 3001)
+npm run client:dev   # Frontend (port 3002)
 ```
 
-## 🧪 Test
+## Test Accounts
 
-**Registration & Login:**
+- **User:** `testuser@example.com` / `TestPass123!`
+- **Admin:** `admin@example.com` / `Admin123!`
 
-- Open http://localhost:3001
-- Register with password: `Password123!`
-- Login: `testuser@example.com` / `Password123!`
+## API Endpoints
 
-**Email Verification:**
+**Auth:** `/api/auth/register`, `/api/auth/login`, `/api/auth/logout`
+**Profile:** `/api/profile` (protected)
+**Todos:** `/api/protected/todos` (email verified required)
+**Admin:** `/api/admin/users` (admin role required)
 
-- New users: verify in profile
-- One-click verification
+## Security & Authorization
 
-**Protected Routes:**
+### Protected Endpoints
 
-- Try `/profile` without login - blocked
-- Auto token refresh works
-
-## 🔧 API
-
-- `POST /api/auth/register` - Register
-- `POST /api/auth/login` - Login
-- `POST /api/auth/logout` - Logout
-- `GET /api/auth/profile` - Profile (protected)
-- `POST /api/auth/resend-verification` - Email verification
+- `/api/profile/*` - Requires valid JWT token
+- `/api/protected/todos/*` - Requires JWT + email verification
+- `/api/admin/*` - Requires JWT + admin role

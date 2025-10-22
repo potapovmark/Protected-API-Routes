@@ -47,7 +47,12 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       } else {
         setError(response.error);
-        return { success: false, error: response.error };
+        return {
+          success: false,
+          error: response.error,
+          accountLocked: response.accountLocked,
+          remainingAttempts: response.remainingAttempts
+        };
       }
     } catch (error) {
       setError('Login failed');

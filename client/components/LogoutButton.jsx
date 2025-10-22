@@ -28,7 +28,7 @@ const LogoutButton = ({ onLogout }) => {
         fontSize: '14px'
       }}
     >
-      {isLoading ? 'Выход...' : 'Выйти'}
+      {isLoading ? 'Logging out...' : 'Logout'}
     </button>
   );
 };

@@ -5,15 +5,15 @@ const ProtectedRoute = ({ children, requiredRole, fallback }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
-    return <div>Загрузка...</div>;
+    return <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {
-    return fallback || <div>Необходима авторизация</div>;
+    return fallback || <div>Authentication required</div>;
   }
 
   if (requiredRole && user.role !== requiredRole) {
-    return <div>Недостаточно прав доступа</div>;
+    return <div>Insufficient permissions</div>;
   }
 
   return children;
