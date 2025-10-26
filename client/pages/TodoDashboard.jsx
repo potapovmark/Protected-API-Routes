@@ -12,6 +12,8 @@ const TodoDashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [stats, setStats] = useState(null);
   const [showStats, setShowStats] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [showStats, setShowStats] = useState(false);
 
   useEffect(() => {
     fetchTodos();
